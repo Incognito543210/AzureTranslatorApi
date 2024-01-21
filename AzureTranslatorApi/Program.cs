@@ -12,7 +12,7 @@ builder.Services.AddScoped<ITranslator, TranslatorService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSingleton<FileService>();
 
 
 var app = builder.Build();
