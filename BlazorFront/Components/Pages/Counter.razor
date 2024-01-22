@@ -1,16 +1,125 @@
-﻿@page "/counter"
+﻿@using System.Collections.Generic
+@using System
+@using System.Threading.Tasks
+@using BlazorFront.Services
+@using Microsoft.AspNetCore.Components
+@page "/translate"
+@inject BlazorFront.Services.TranslateService TranslateService
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @rendermode InteractiveServer
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Translate</PageTitle>
 
-<h1>Counter</h1>
+<h1>Translate</h1>
 
-<p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<div>
+    <label for="inL">Document language:</label>
+    <input id="inL" @bind="inputLanguage" />
+
+    <label for="outL">Translate to language:</label>
+    <input id="outL" @bind="outputLanguage" />
+
+    <button class="btn btn-primary" @onclick="Translate">Translate</button>
+</div>
+
+
+<div class="mt-3">
+    <label><strong>Available Languages:</strong></label>
+    <ul>
+        @foreach (var lang in languageList)
+        {
+            <li>@lang</li>
+        }
+    </ul>
+</div>
+
+
+
+
+
+
+@if (showMessage)
+{
+    <div class="alert alert-info mt-3" role="alert">
+        Translation sent, go to the Download File.
+    </div>
+}
+
+@if (showMessageEmptyInput)
+{
+    <div class="alert alert-info mt-3" role="alert">
+        Enter the languages to be translated
+    </div>
+}
+
 
 @code {
     private int currentCount = 0;
+    private string inputLanguage = "";
+    private string outputLanguage = "";
+    private bool showMessage = false;
+    private bool showMessageEmptyInput = false;
+
+    private List<string> languageList = new List<string>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Read languages from the file during initialization
+        string filePath = "E:\\VisualStudio\\Project\\AzureTranslatorApi\\BlazorFront\\Components\\Languages.txt"; // Update with your file path
+        languageList = await ReadLanguagesFromFile(filePath);
+    }
+
+    private async Task<List<string>> ReadLanguagesFromFile(string filePath)
+    {
+        try
+        {
+            // Read all lines from the file
+            string[] lines = await System.IO.File.ReadAllLinesAsync(filePath);
+            return lines.ToList();
+        }
+        catch (Exception ex)
+        {
+            // Handle file reading errors
+            Console.WriteLine($"Error reading file: {ex.Message}");
+            return new List<string>();
+        }
+    }
+
+
+    private void clearInput()
+    {
+        inputLanguage = "";
+        outputLanguage = "";
+    }
+
+    private async Task Translate()
+    {
+        if (inputLanguage.Equals("") || outputLanguage.Equals(""))
+        {
+            showMessageEmptyInput = true;
+        }
+        else
+        {
+
+            try
+            {
+                // Call TranslateAsync method from TranslateService
+                var result = await TranslateService.TranslateAsync(inputLanguage, outputLanguage);
+                // You can do something with the translation result if needed
+                Console.WriteLine(result);
+                showMessage = true;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions if necessary
+                Console.WriteLine($"Translation error: {ex.Message}");
+            }
+
+            clearInput();
+        }
+    }
 
     private void IncrementCount()
     {

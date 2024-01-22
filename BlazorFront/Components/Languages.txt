@@ -1,0 +1,34 @@
+Angielski: en
+Francuski: fr
+Hiszpański: es
+Niemiecki: de
+Włoski: it
+Portugalski: pt
+Rosyjski: ru
+Chiński uproszczony: zh-Hans
+Chiński tradycyjny: zh-Hant
+Japoński: ja
+Koreański: ko
+Arabski: ar
+Holenderski: nl
+Polski: pl
+Szwedzki: sv
+Norweski: no
+Duński: da
+Czechy: cs
+Słowacki: sk
+Polski: pl
+Hindi: hi
+Bengalski: bn
+Gujarati: gu
+Marathi: mr
+Tamilski: ta
+Telugu: te
+Kannada: kn
+Tajski: th
+Wietnamski: vi
+Indonezyjski: id
+Malezyjski: ms
+Filipiński: fil
+Afrikaans: af
+Suahili: sw

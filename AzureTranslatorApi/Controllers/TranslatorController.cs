@@ -5,7 +5,7 @@ namespace AzureTranslatorApi.Controllers
 {
     [ApiController]
     [Route("Api/[controller]")]
-    public class TranslatorController: ControllerBase
+    public class TranslatorController : ControllerBase
     {
         private readonly ITranslator _translator;
 
@@ -13,12 +13,12 @@ namespace AzureTranslatorApi.Controllers
         {
             _translator = translator;
         }
-        
 
-        [HttpGet]
+
+        [HttpGet("{inL},{outL}")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesResponseType(400)]
-        public IActionResult GetParamsInfo(string inL, string outL)
+        public IActionResult Translate(string inL, string outL)
         {
 
             var Info = _translator.TranslateAsync(inL, outL);
