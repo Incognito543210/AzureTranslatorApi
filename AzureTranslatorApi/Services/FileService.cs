@@ -103,29 +103,34 @@ namespace AzureTranslatorApi.Services
         {
             var files = await ListInputsAsync();
             List<BlobResponseDto> response = new List<BlobResponseDto>();
-            foreach (var _file in files)
+            if (files.Count != 0)
             {
-                BlobClient file = _filesContainerInputs.GetBlobClient(_file.Name);
+                foreach (var _file in files)
+                {
+                    BlobClient file = _filesContainerInputs.GetBlobClient(_file.Name);
 
-                await file.DeleteAsync();
+                    await file.DeleteAsync();
 
-                response.Add(new BlobResponseDto { Error = false, Status = $"File: {_file} has been successfully deleted." });
+                    response.Add(new BlobResponseDto { Error = false, Status = $"File: {_file} has been successfully deleted." });
+                }
             }
-            return response;
-
+                return response;
         }
 
         public async Task<List<BlobResponseDto>> DeleteOutputsAsync()
         {
             var files = await ListOutputsAsync();
             List<BlobResponseDto> response = new List<BlobResponseDto>();
-            foreach (var _file in files)
+            if (files.Count != 0)
             {
-                BlobClient file = _filesContainerInputs.GetBlobClient(_file.Name);
+                foreach (var _file in files)
+                {
+                    BlobClient file = _filesContainerInputs.GetBlobClient(_file.Name);
 
-                await file.DeleteAsync();
+                    await file.DeleteAsync();
 
-                response.Add(new BlobResponseDto { Error = false, Status = $"File: {_file} has been successfully deleted." });
+                    response.Add(new BlobResponseDto { Error = false, Status = $"File: {_file} has been successfully deleted." });
+                }
             }
             return response;
         }

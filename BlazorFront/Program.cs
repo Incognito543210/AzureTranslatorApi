@@ -8,6 +8,8 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddScoped<BlazorFront.Services.TranslateService>();
+builder.Services.AddScoped<BlazorFront.Services.FileService>();
+
 
 builder.Services.AddHttpClient();
 
