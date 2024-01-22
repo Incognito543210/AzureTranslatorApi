@@ -15,6 +15,15 @@
 
 
 <div>
+
+    <label for="fP">File Path:</label>
+    <input id="fP" @bind="filePathTranslate" />
+    <button class="btn btn-primary" @onclick="SendFile">Send file</button>
+
+
+</div>
+
+<div>
     <label for="inL">Document language:</label>
     <input id="inL" @bind="inputLanguage" />
 
@@ -24,21 +33,12 @@
     <button class="btn btn-primary" @onclick="Translate">Translate</button>
 </div>
 
-<InputFile OnChange="@LoadFiles" class="form-control" single accept=".txt" />
-
-<div class="mt-3">
-    <label><strong>Available Languages:</strong></label>
-    <ul>
-        @foreach (var lang in languageList)
-        {
-            <li>@lang</li>
-        }
-    </ul>
-</div>
-
-
-
-
+@if (showMessageSend)
+{
+    <div class="alert alert-info mt-3" role="alert">
+        File send, choice language and clik "Translate".
+    </div>
+}
 
 
 @if (showMessage)
@@ -51,7 +51,7 @@
 @if (showMessageEmptyInput)
 {
     <div class="alert alert-info mt-3" role="alert">
-        Enter the languages to be translated
+        Enter the some value.
     </div>
 }
 
@@ -67,43 +67,31 @@
     </ul>
 }
 
+<div class="mt-3">
+    <label><strong>Available Languages:</strong></label>
+    <ul>
+        @foreach (var lang in languageList)
+        {
+            <li>@lang</li>
+        }
+    </ul>
+</div>
+
 @code {
-    private long maxFileSize = 1024 * 1024 * 25; //represents 25MB
-    private int maxAllowedFiles = 1;
+
     private List<string> errors = new();
+    private string filePathTranslate = "";
+
 
     private int currentCount = 0;
     private string inputLanguage = "";
     private string outputLanguage = "";
     private bool showMessage = false;
     private bool showMessageEmptyInput = false;
-
+    private bool showMessageSend = false;
     private List<string> languageList = new List<string>();
 
-    private async Task LoadFiles(InputFileChangeEventArgs e)
-    {
-        errors.Clear();
 
-        await FileService.DeleteInputsAsync();
-
-        if (e.FileCount > maxAllowedFiles)
-        {
-            errors.Add($"Error: Attempting to uploaad {e.FileCount} files, but only {maxAllowedFiles} files are allowed");
-            return;
-        }
-
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
-        {
-            try
-            {
-                var result = await FileService.UploadAsync(file);
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"File: {file.Name} Error:{ex.Message}");
-            }
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,15 +117,40 @@
     }
 
 
-    private void clearInput()
+    private void clearInputLanguage()
     {
         inputLanguage = "";
         outputLanguage = "";
     }
+    private void clearInputSend()
+    {
+        filePathTranslate = "";
+    }
+
+    private async Task SendFile()
+    {
+        showMessageSend = true;
+        await FileService.DeleteInputsAsync();
+        try
+        {
+
+            string correctfilePath = correctString(filePathTranslate);
+
+            var result = await FileService.UploadAsync(correctfilePath);
+
+
+        }catch(Exception ex)
+        {
+            Console.WriteLine($"Translation error: {ex.Message}");
+        }
+
+        clearInputSend();
+
+    }
 
     private async Task Translate()
     {
-        await FileService.DeleteOutputsAsync();
+      
 
         if (inputLanguage.Equals("") || outputLanguage.Equals(""))
         {
@@ -160,12 +173,16 @@
                 Console.WriteLine($"Translation error: {ex.Message}");
             }
 
-            clearInput();
+            clearInputLanguage();
         }
     }
 
-    private void IncrementCount()
+    private string correctString(string path)
     {
-        currentCount++;
+        string correctstring = path;
+        correctstring = correctstring.Trim('"');
+        correctstring = correctstring.Replace("\\", ";");
+        correctstring = correctstring.Trim('"');
+        return correctstring;
     }
 }

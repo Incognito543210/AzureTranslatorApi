@@ -37,22 +37,11 @@ namespace BlazorFront.Services
             }
         }
 
-        public async Task<string> UploadAsync(IBrowserFile file)
+        public async Task<string> UploadAsync(string filePath )
         {
-            StreamContent streamContent = new StreamContent(file.OpenReadStream())
-            {
-                Headers =
-            {
-                ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
-                {
-                    Name = "\"file\"",
-                    FileName = "\"" + file.Name + "\""
-                },
-                ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType)
-            }
-            };
+          
 
-            var response = await _httpClient.PostAsync("https://localhost:7297/Files/Upload/", streamContent);
+            var response = await _httpClient.GetAsync("https://localhost:7297/Files/Upload/"+filePath);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();

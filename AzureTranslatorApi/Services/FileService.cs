@@ -60,20 +60,38 @@ namespace AzureTranslatorApi.Services
             return files;
         }
 
-        public async Task<BlobResponseDto> UploadAsync(IBrowserFile blob)
+        public async Task<BlobResponseDto> UploadAsync(string filePath)
         {
-            BlobResponseDto response = new();
-            BlobClient client = _filesContainerInputs.GetBlobClient(blob.Name);
+            BlobResponseDto response = new BlobResponseDto();
 
-            await using (Stream? data = blob.OpenReadStream())
+            filePath= filePath.Trim('"');
+            filePath = filePath.Replace(";", "\\");
+            string fileName = Path.GetFileName(filePath);
+
+
+            BlobClient client = _filesContainerInputs.GetBlobClient(fileName);
+
+            try
             {
-                await client.UploadAsync(data);
-            }
+                // Otwórz strumień danych z pliku na dysku
+                await using (Stream data = File.OpenRead(filePath))
+                {
+                    // Wgraj plik na Blob Storage
+                    await client.UploadAsync(data);
+                }
 
-            response.Status = $"File {blob.Name} Uploaded Successfully";
-            response.Error = false;
-            response.Blob.Uri = client.Uri.AbsoluteUri;
-            response.Blob.Name = client.Name;
+                // Ustaw informacje w odpowiedzi
+                response.Status = $"File {fileName} uploaded successfully";
+                response.Error = false;
+                response.Blob.Uri = client.Uri.AbsoluteUri;
+                response.Blob.Name = client.Name;
+            }
+            catch (Exception ex)
+            {
+                // Obsłuż ewentualne błędy
+                response.Status = $"Error uploading file: {ex.Message}";
+                response.Error = true;
+            }
 
             return response;
         }
@@ -87,17 +105,38 @@ namespace AzureTranslatorApi.Services
 
                 if (await file.ExistsAsync())
                 {
-                    var data = await file.OpenReadAsync();
-                    Stream blobContent = data;
-                    var content = await file.DownloadContentAsync();
+                    var downloadResponse = await file.DownloadAsync();
 
-                    string name = blobFiles.FirstOrDefault().Name;
-                    string contentType = content.Value.Details.ContentType;
+                    if (downloadResponse != null && downloadResponse.Value != null)
+                    {
+                        string name = blobFiles.FirstOrDefault().Name;
+                        string contentType = downloadResponse.Value.ContentType;
 
-                    return new BlobDto { Content = blobContent, Name = name, ContentType = contentType };
+                        string projectPath = AppDomain.CurrentDomain.BaseDirectory;
+                        string folderName = "TranslateDocuments";
+                        string folderPath = Path.Combine(projectPath, folderName);
+
+
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+
+                        // Tutaj można podać ścieżkę do folderu, gdzie chcesz zapisać plik
+                        string filePath = Path.Combine(folderPath, name);
+
+                        using (var fileStream = File.OpenWrite(filePath))
+                        {
+                            await downloadResponse.Value.Content.CopyToAsync(fileStream);
+                            fileStream.Close();
+                        }
+
+                        return new BlobDto { Uri = null, Name = name, ContentType = contentType, FilePath = filePath };
+                    }
                 }
             }
             return null;
+
         }
 
         public async Task<List<BlobResponseDto>> DeleteInputsAsync()

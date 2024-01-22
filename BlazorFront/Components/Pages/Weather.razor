@@ -1,6 +1,7 @@
 ﻿@page "/download"
 @attribute [StreamRendering]
 @inject BlazorFront.Services.FileService FileService
+@rendermode InteractiveServer
 
 <PageTitle>Download File</PageTitle>
 
@@ -10,9 +11,25 @@
     <button class="btn btn-primary" @onclick="Download">Download translated file</button>
 </div>
 
+@if (showMessage)
+{
+    <div class="alert alert-info mt-3" role="alert">
+        Download File, check folder.
+    </div>
+}
+
+
+
+
 @code{
+
+    private bool showMessage = false;
+
     private async Task Download()
     {
+        await FileService.DownloadFile();
+        showMessage = true;
 
+        await FileService.DeleteOutputsAsync();
     }
 }

@@ -31,11 +31,11 @@ namespace AzureTranslatorApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [Route("Upload")]
-        public async Task<IActionResult> Upload(IBrowserFile file)
+        [HttpGet]
+        [Route("Upload/{filePath}")]
+        public async Task<IActionResult> Upload(String filePath)
         {
-            var result = await _fileService.UploadAsync(file);
+            var result = await _fileService.UploadAsync(filePath);
             return Ok(result);
         }
 
@@ -46,7 +46,7 @@ namespace AzureTranslatorApi.Controllers
             var result = await _fileService.DownloadAsync();
             if (result != null)
             {
-                return File(result.Content, result.ContentType, result.Name);
+                return Ok(result.FilePath);
             }
             return NotFound();
         }
