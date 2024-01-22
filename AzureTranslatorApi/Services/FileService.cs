@@ -1,6 +1,7 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
 using AzureTranslatorApi.DTO;
+using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel;
 
 namespace AzureTranslatorApi.Services
@@ -59,17 +60,17 @@ namespace AzureTranslatorApi.Services
             return files;
         }
 
-        public async Task<BlobResponseDto> UploadAsync(IFormFile blob)
+        public async Task<BlobResponseDto> UploadAsync(IBrowserFile blob)
         {
             BlobResponseDto response = new();
-            BlobClient client = _filesContainerInputs.GetBlobClient(blob.FileName);
+            BlobClient client = _filesContainerInputs.GetBlobClient(blob.Name);
 
             await using (Stream? data = blob.OpenReadStream())
             {
                 await client.UploadAsync(data);
             }
 
-            response.Status = $"File {blob.FileName} Uploaded Successfully";
+            response.Status = $"File {blob.Name} Uploaded Successfully";
             response.Error = false;
             response.Blob.Uri = client.Uri.AbsoluteUri;
             response.Blob.Name = client.Name;

@@ -1,4 +1,5 @@
 ﻿using AzureTranslatorApi.Services;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzureTranslatorApi.Controllers
@@ -32,7 +33,7 @@ namespace AzureTranslatorApi.Controllers
 
         [HttpPost]
         [Route("Upload")]
-        public async Task<IActionResult> Upload(IFormFile file)
+        public async Task<IActionResult> Upload(IBrowserFile file)
         {
             var result = await _fileService.UploadAsync(file);
             return Ok(result);

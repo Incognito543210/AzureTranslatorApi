@@ -96,7 +96,7 @@
         {
             try
             {
-                var result = await FileService.UploadAsync((IFormFile)file);
+                var result = await FileService.UploadAsync(file);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorFront.Services
 {
@@ -37,9 +37,22 @@ namespace BlazorFront.Services
             }
         }
 
-        public async Task<string> UploadAsync(IFormFile blob)
+        public async Task<string> UploadAsync(IBrowserFile file)
         {
-            var response = await _httpClient.PostAsync("https://localhost:7297/Files/Upload/", (HttpContent)blob);
+            StreamContent streamContent = new StreamContent(file.OpenReadStream())
+            {
+                Headers =
+            {
+                ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"file\"",
+                    FileName = "\"" + file.Name + "\""
+                },
+                ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType)
+            }
+            };
+
+            var response = await _httpClient.PostAsync("https://localhost:7297/Files/Upload/", streamContent);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
