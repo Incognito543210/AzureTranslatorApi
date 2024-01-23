@@ -165,7 +165,7 @@ namespace AzureTranslatorApi.Services
             {
                 foreach (var _file in files)
                 {
-                    BlobClient file = _filesContainerInputs.GetBlobClient(_file.Name);
+                    BlobClient file = _filesContainerOutputs.GetBlobClient(_file.Name);
 
                     await file.DeleteAsync();
 
