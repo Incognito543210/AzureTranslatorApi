@@ -1,12 +1,13 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
 using AzureTranslatorApi.DTO;
+using AzureTranslatorApi.Interfaces;
 using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel;
 
 namespace AzureTranslatorApi.Services
 {
-    public class FileService
+    public class FileService : IFileService
     {
         private readonly string _storageAccount = "azureblobsforclasses";
         private readonly string _key = "2YNkijDoR+jXhgZcaS7bzXL77DGJdr9lLhgRMa8It2S2mULs56w9Di+mtilNR81EfCbOqYjNpVpz+AStXcB51A==";
